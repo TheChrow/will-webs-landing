@@ -1,4 +1,4 @@
-# LED Studio — Landing (will-webs-landing)
+# Will-Webs — Landing (will-webs-landing)
 
 Landing de **una sola página** (one-page) construida con **Bootstrap 5** (vía CDN),
 generada a partir del plano de Excalidraw. Navegación por anclas.
