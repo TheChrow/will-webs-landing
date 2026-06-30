@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LED Studio — Transformación digital y software a medida</title>
+  <meta name="description" content="Automatizamos procesos, creamos software a medida e integramos tus plataformas con IA." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ============================================================
+       HEADER / NAV  (barra superior fija)
+       Logo · navegación ancla · botón Contactos (redirige al form)
+       ============================================================ -->
+  <header class="site-header" id="top">
+    <div class="container header__inner">
+      <a class="logo" href="#top" aria-label="LED Studio - inicio">
+        <span class="logo__mark">▰</span> LED&nbsp;Studio
+      </a>
+
+      <nav class="nav" aria-label="Navegación principal">
+        <a href="#servicios">Nuestros servicios</a>
+        <a href="#sobre-nosotros">Sobre nosotros</a>
+      </nav>
+
+      <a href="#contacto" class="btn btn--primary nav__cta">Contactos</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============================================================
+         HERO / BANNER SLIDER
+         Mensaje principal + CTA above-the-fold (slider opcional)
+         ============================================================ -->
+    <section class="hero" id="inicio">
+      <div class="container hero__inner">
+        <div class="hero__content">
+          <h1 class="hero__title">Modernizamos tu empresa con software a medida</h1>
+          <p class="hero__subtitle">
+            Automatizamos procesos, integramos tus plataformas e implementamos
+            inteligencia artificial para aumentar tu productividad.
+          </p>
+          <div class="hero__actions">
+            <a href="#contacto" class="btn btn--primary">Contáctenos</a>
+            <a href="#servicios" class="btn btn--ghost">Ver servicios</a>
+          </div>
+        </div>
+
+        <!-- Slider: rellenar con las diapositivas reales -->
+        <div class="hero__slider" aria-roledescription="carrusel" aria-label="Banner">
+          <div class="slide slide--active"><!-- slide 1 --></div>
+          <div class="slide"><!-- slide 2 --></div>
+          <div class="slide"><!-- slide 3 --></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SERVICIOS DIGITALES  (grid — "Listados" del plano)
+         ============================================================ -->
+    <section class="services section" id="servicios">
+      <div class="container">
+        <h2 class="section__title">Servicios Digitales</h2>
+        <ul class="services__grid">
+          <li class="service-card"><h3>Automatización de procesos</h3><p>Automatizamos procesos empresariales.</p></li>
+          <li class="service-card"><h3>Software a medida</h3><p>Creamos software que se adapta a tu empresa.</p></li>
+          <li class="service-card"><h3>Integraciones</h3><p>Integramos todas tus plataformas.</p></li>
+          <li class="service-card"><h3>Inteligencia Artificial</h3><p>Implementamos IA para aumentar la productividad.</p></li>
+          <li class="service-card"><h3>Infraestructura</h3><p>Modernizamos tu infraestructura tecnológica.</p></li>
+          <li class="service-card"><h3>Correo empresarial</h3><p>Migramos y administramos tu correo empresarial.</p></li>
+          <li class="service-card"><h3>Aplicaciones web</h3><p>Desarrollamos aplicaciones web escalables.</p></li>
+          <li class="service-card"><h3>Respaldo y seguridad</h3><p>Protegemos y respaldamos tu información.</p></li>
+          <li class="service-card"><h3>Transformación digital</h3><p>Acompañamos la transformación digital de tu empresa.</p></li>
+          <li class="service-card"><h3>Soporte continuo</h3><p>Brindamos soporte tecnológico continuo.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         CTA  (botón Contáctenos -> redirige al formulario)
+         ============================================================ -->
+    <section class="cta-band">
+      <div class="container cta-band__inner">
+        <p>¿Listo para dar el siguiente paso?</p>
+        <a href="#contacto" class="btn btn--primary">Contáctenos</a>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SOBRE NOSOTROS — MISIÓN Y VISIÓN
+         ============================================================ -->
+    <section class="about section" id="sobre-nosotros">
+      <div class="container about__grid">
+        <article class="about__card">
+          <h2 class="section__title">Misión</h2>
+          <p><!-- Texto de misión --></p>
+        </article>
+        <article class="about__card">
+          <h2 class="section__title">Visión</h2>
+          <p><!-- Texto de visión --></p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         CINTA DE EMPRESAS  (marquesina auto-scroll, ciclo 3.6 s)
+         Duplicar la lista de logos para loop infinito sin saltos
+         ============================================================ -->
+    <section class="clients section" aria-label="Empresas que confían en nosotros">
+      <div class="container">
+        <h2 class="section__title section__title--sm">Empresas que confían en nosotros</h2>
+        <div class="marquee">
+          <ul class="marquee__track">
+            <!-- logos -->
+            <li class="marquee__item">Logo 1</li>
+            <li class="marquee__item">Logo 2</li>
+            <li class="marquee__item">Logo 3</li>
+            <!-- copia duplicada para el loop -->
+            <li class="marquee__item" aria-hidden="true">Logo 1</li>
+            <li class="marquee__item" aria-hidden="true">Logo 2</li>
+            <li class="marquee__item" aria-hidden="true">Logo 3</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FORMULARIO DE CONTACTO  (destino "Redirige" del plano)
+         ============================================================ -->
+    <section class="contact section" id="contacto">
+      <div class="container">
+        <h2 class="section__title">Formulario de Contacto</h2>
+        <form class="contact__form" action="#" method="post">
+          <div class="field">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" name="nombre" type="text" required />
+          </div>
+          <div class="field">
+            <label for="email">Correo electrónico</label>
+            <input id="email" name="email" type="email" required />
+          </div>
+          <div class="field">
+            <label for="empresa">Empresa</label>
+            <input id="empresa" name="empresa" type="text" />
+          </div>
+          <div class="field field--full">
+            <label for="mensaje">Mensaje</label>
+            <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary">Enviar</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div class="logo logo--footer"><span class="logo__mark">▰</span> LED Studio</div>
+      <nav class="footer-nav" aria-label="Enlaces de pie">
+        <a href="#servicios">Servicios</a>
+        <a href="#sobre-nosotros">Sobre nosotros</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+      <p class="site-footer__copy">© <span id="year"></span> LED Studio. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
