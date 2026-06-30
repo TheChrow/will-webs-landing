@@ -5,119 +5,235 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LED Studio — Transformación digital y software a medida</title>
   <meta name="description" content="Automatizamos procesos, creamos software a medida e integramos tus plataformas con IA." />
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Estilos de marca (overrides) -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
   <!-- ============================================================
-       HEADER / NAV  (barra superior fija)
-       Logo · navegación ancla · botón Contactos (redirige al form)
+       HEADER / NAVBAR  (Logo · nav · botón Contactos)
+       Navbar Bootstrap = menú hamburguesa móvil incluido
        ============================================================ -->
-  <header class="site-header" id="top">
-    <div class="container header__inner">
-      <a class="logo" href="#top" aria-label="LED Studio - inicio">
-        <span class="logo__mark">▰</span> LED&nbsp;Studio
-      </a>
-
-      <nav class="nav" aria-label="Navegación principal">
-        <a href="#servicios">Nuestros servicios</a>
-        <a href="#sobre-nosotros">Sobre nosotros</a>
-      </nav>
-
-      <a href="#contacto" class="btn btn--primary nav__cta">Contactos</a>
-    </div>
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-brand-dark sticky-top shadow-sm">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="#top">
+          <span class="text-brand-accent">▰</span> LED&nbsp;Studio
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#mainNav" aria-controls="mainNav"
+                aria-expanded="false" aria-label="Abrir menú">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+          <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+            <li class="nav-item"><a class="nav-link" href="#servicios">Nuestros servicios</a></li>
+            <li class="nav-item"><a class="nav-link" href="#sobre-nosotros">Sobre nosotros</a></li>
+            <li class="nav-item ms-lg-2">
+              <a class="btn btn-brand" href="#contacto">Contactos</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
   </header>
 
-  <main>
+  <main id="top">
 
     <!-- ============================================================
-         HERO / BANNER SLIDER
-         Mensaje principal + CTA above-the-fold (slider opcional)
+         HERO / BANNER SLIDER  (carrusel Bootstrap)
          ============================================================ -->
-    <section class="hero" id="inicio">
-      <div class="container hero__inner">
-        <div class="hero__content">
-          <h1 class="hero__title">Modernizamos tu empresa con software a medida</h1>
-          <p class="hero__subtitle">
-            Automatizamos procesos, integramos tus plataformas e implementamos
-            inteligencia artificial para aumentar tu productividad.
-          </p>
-          <div class="hero__actions">
-            <a href="#contacto" class="btn btn--primary">Contáctenos</a>
-            <a href="#servicios" class="btn btn--ghost">Ver servicios</a>
+    <section class="hero bg-brand-dark text-white" id="inicio">
+      <div class="container py-5">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-6">
+            <h1 class="display-5 fw-bold mb-3">Modernizamos tu empresa con software a medida</h1>
+            <p class="lead text-white-50 mb-4">
+              Automatizamos procesos, integramos tus plataformas e implementamos
+              inteligencia artificial para aumentar tu productividad.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+              <a href="#contacto" class="btn btn-brand btn-lg">Contáctenos</a>
+              <a href="#servicios" class="btn btn-outline-light btn-lg">Ver servicios</a>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div id="heroCarousel" class="carousel slide rounded-4 overflow-hidden shadow"
+                 data-bs-ride="carousel">
+              <div class="carousel-indicators">
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+              </div>
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <div class="hero-slide d-flex align-items-center justify-content-center">Banner 1</div>
+                </div>
+                <div class="carousel-item">
+                  <div class="hero-slide d-flex align-items-center justify-content-center">Banner 2</div>
+                </div>
+                <div class="carousel-item">
+                  <div class="hero-slide d-flex align-items-center justify-content-center">Banner 3</div>
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Anterior</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Siguiente</span>
+              </button>
+            </div>
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- Slider: rellenar con las diapositivas reales -->
-        <div class="hero__slider" aria-roledescription="carrusel" aria-label="Banner">
-          <div class="slide slide--active"><!-- slide 1 --></div>
-          <div class="slide"><!-- slide 2 --></div>
-          <div class="slide"><!-- slide 3 --></div>
+    <!-- ============================================================
+         SERVICIOS DIGITALES  (grid de cards — "Listados")
+         ============================================================ -->
+    <section class="py-5" id="servicios">
+      <div class="container py-4">
+        <h2 class="text-center fw-bold mb-5 text-brand">Servicios Digitales</h2>
+        <div class="row g-4">
+          <!-- repetir col por servicio -->
+          <div class="col-sm-6 col-lg-4 col-xl-3">
+            <div class="card h-100 service-card shadow-sm border-0">
+              <div class="card-body">
+                <h3 class="h6 fw-bold text-brand">Automatización de procesos</h3>
+                <p class="text-secondary mb-0 small">Automatizamos procesos empresariales.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-4 col-xl-3">
+            <div class="card h-100 service-card shadow-sm border-0">
+              <div class="card-body">
+                <h3 class="h6 fw-bold text-brand">Software a medida</h3>
+                <p class="text-secondary mb-0 small">Creamos software que se adapta a tu empresa.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-4 col-xl-3">
+            <div class="card h-100 service-card shadow-sm border-0">
+              <div class="card-body">
+                <h3 class="h6 fw-bold text-brand">Integraciones</h3>
+                <p class="text-secondary mb-0 small">Integramos todas tus plataformas.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-4 col-xl-3">
+            <div class="card h-100 service-card shadow-sm border-0">
+              <div class="card-body">
+                <h3 class="h6 fw-bold text-brand">Inteligencia Artificial</h3>
+                <p class="text-secondary mb-0 small">Implementamos IA para aumentar la productividad.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-4 col-xl-3">
+            <div class="card h-100 service-card shadow-sm border-0">
+              <div class="card-body">
+                <h3 class="h6 fw-bold text-brand">Infraestructura</h3>
+                <p class="text-secondary mb-0 small">Modernizamos tu infraestructura tecnológica.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-4 col-xl-3">
+            <div class="card h-100 service-card shadow-sm border-0">
+              <div class="card-body">
+                <h3 class="h6 fw-bold text-brand">Correo empresarial</h3>
+                <p class="text-secondary mb-0 small">Migramos y administramos tu correo empresarial.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-4 col-xl-3">
+            <div class="card h-100 service-card shadow-sm border-0">
+              <div class="card-body">
+                <h3 class="h6 fw-bold text-brand">Aplicaciones web</h3>
+                <p class="text-secondary mb-0 small">Desarrollamos aplicaciones web escalables.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-4 col-xl-3">
+            <div class="card h-100 service-card shadow-sm border-0">
+              <div class="card-body">
+                <h3 class="h6 fw-bold text-brand">Respaldo y seguridad</h3>
+                <p class="text-secondary mb-0 small">Protegemos y respaldamos tu información.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-4 col-xl-3">
+            <div class="card h-100 service-card shadow-sm border-0">
+              <div class="card-body">
+                <h3 class="h6 fw-bold text-brand">Transformación digital</h3>
+                <p class="text-secondary mb-0 small">Acompañamos la transformación digital de tu empresa.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-4 col-xl-3">
+            <div class="card h-100 service-card shadow-sm border-0">
+              <div class="card-body">
+                <h3 class="h6 fw-bold text-brand">Soporte continuo</h3>
+                <p class="text-secondary mb-0 small">Brindamos soporte tecnológico continuo.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- ============================================================
-         SERVICIOS DIGITALES  (grid — "Listados" del plano)
+         CTA  (botón Contáctenos -> formulario)
          ============================================================ -->
-    <section class="services section" id="servicios">
+    <section class="py-5 bg-brand text-white">
       <div class="container">
-        <h2 class="section__title">Servicios Digitales</h2>
-        <ul class="services__grid">
-          <li class="service-card"><h3>Automatización de procesos</h3><p>Automatizamos procesos empresariales.</p></li>
-          <li class="service-card"><h3>Software a medida</h3><p>Creamos software que se adapta a tu empresa.</p></li>
-          <li class="service-card"><h3>Integraciones</h3><p>Integramos todas tus plataformas.</p></li>
-          <li class="service-card"><h3>Inteligencia Artificial</h3><p>Implementamos IA para aumentar la productividad.</p></li>
-          <li class="service-card"><h3>Infraestructura</h3><p>Modernizamos tu infraestructura tecnológica.</p></li>
-          <li class="service-card"><h3>Correo empresarial</h3><p>Migramos y administramos tu correo empresarial.</p></li>
-          <li class="service-card"><h3>Aplicaciones web</h3><p>Desarrollamos aplicaciones web escalables.</p></li>
-          <li class="service-card"><h3>Respaldo y seguridad</h3><p>Protegemos y respaldamos tu información.</p></li>
-          <li class="service-card"><h3>Transformación digital</h3><p>Acompañamos la transformación digital de tu empresa.</p></li>
-          <li class="service-card"><h3>Soporte continuo</h3><p>Brindamos soporte tecnológico continuo.</p></li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- ============================================================
-         CTA  (botón Contáctenos -> redirige al formulario)
-         ============================================================ -->
-    <section class="cta-band">
-      <div class="container cta-band__inner">
-        <p>¿Listo para dar el siguiente paso?</p>
-        <a href="#contacto" class="btn btn--primary">Contáctenos</a>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <p class="h4 mb-0">¿Listo para dar el siguiente paso?</p>
+          <a href="#contacto" class="btn btn-light btn-lg text-brand fw-semibold">Contáctenos</a>
+        </div>
       </div>
     </section>
 
     <!-- ============================================================
          SOBRE NOSOTROS — MISIÓN Y VISIÓN
          ============================================================ -->
-    <section class="about section" id="sobre-nosotros">
-      <div class="container about__grid">
-        <article class="about__card">
-          <h2 class="section__title">Misión</h2>
-          <p><!-- Texto de misión --></p>
-        </article>
-        <article class="about__card">
-          <h2 class="section__title">Visión</h2>
-          <p><!-- Texto de visión --></p>
-        </article>
+    <section class="py-5" id="sobre-nosotros">
+      <div class="container py-4">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-body p-4">
+                <h2 class="h4 fw-bold text-brand mb-3">Misión</h2>
+                <p class="text-secondary mb-0"><!-- Texto de misión --></p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-body p-4">
+                <h2 class="h4 fw-bold text-brand mb-3">Visión</h2>
+                <p class="text-secondary mb-0"><!-- Texto de visión --></p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- ============================================================
          CINTA DE EMPRESAS  (marquesina auto-scroll, ciclo 3.6 s)
-         Duplicar la lista de logos para loop infinito sin saltos
          ============================================================ -->
-    <section class="clients section" aria-label="Empresas que confían en nosotros">
+    <section class="py-5 bg-light" aria-label="Empresas que confían en nosotros">
       <div class="container">
-        <h2 class="section__title section__title--sm">Empresas que confían en nosotros</h2>
+        <h2 class="h6 text-center text-secondary text-uppercase mb-4">Empresas que confían en nosotros</h2>
         <div class="marquee">
-          <ul class="marquee__track">
-            <!-- logos -->
+          <ul class="marquee__track list-unstyled mb-0">
             <li class="marquee__item">Logo 1</li>
             <li class="marquee__item">Logo 2</li>
             <li class="marquee__item">Logo 3</li>
-            <!-- copia duplicada para el loop -->
+            <!-- copia para loop infinito -->
             <li class="marquee__item" aria-hidden="true">Logo 1</li>
             <li class="marquee__item" aria-hidden="true">Logo 2</li>
             <li class="marquee__item" aria-hidden="true">Logo 3</li>
@@ -127,29 +243,31 @@
     </section>
 
     <!-- ============================================================
-         FORMULARIO DE CONTACTO  (destino "Redirige" del plano)
+         FORMULARIO DE CONTACTO
          ============================================================ -->
-    <section class="contact section" id="contacto">
-      <div class="container">
-        <h2 class="section__title">Formulario de Contacto</h2>
-        <form class="contact__form" action="#" method="post">
-          <div class="field">
-            <label for="nombre">Nombre</label>
-            <input id="nombre" name="nombre" type="text" required />
+    <section class="py-5" id="contacto">
+      <div class="container py-4">
+        <h2 class="text-center fw-bold mb-5 text-brand">Formulario de Contacto</h2>
+        <form class="row g-3 mx-auto" style="max-width: 720px;" action="#" method="post">
+          <div class="col-md-6">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input id="nombre" name="nombre" type="text" class="form-control" required />
           </div>
-          <div class="field">
-            <label for="email">Correo electrónico</label>
-            <input id="email" name="email" type="email" required />
+          <div class="col-md-6">
+            <label for="email" class="form-label">Correo electrónico</label>
+            <input id="email" name="email" type="email" class="form-control" required />
           </div>
-          <div class="field">
-            <label for="empresa">Empresa</label>
-            <input id="empresa" name="empresa" type="text" />
+          <div class="col-12">
+            <label for="empresa" class="form-label">Empresa</label>
+            <input id="empresa" name="empresa" type="text" class="form-control" />
           </div>
-          <div class="field field--full">
-            <label for="mensaje">Mensaje</label>
-            <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
+          <div class="col-12">
+            <label for="mensaje" class="form-label">Mensaje</label>
+            <textarea id="mensaje" name="mensaje" rows="4" class="form-control" required></textarea>
           </div>
-          <button type="submit" class="btn btn--primary">Enviar</button>
+          <div class="col-12">
+            <button type="submit" class="btn btn-brand btn-lg">Enviar</button>
+          </div>
         </form>
       </div>
     </section>
@@ -159,18 +277,22 @@
   <!-- ============================================================
        FOOTER
        ============================================================ -->
-  <footer class="site-footer">
-    <div class="container site-footer__inner">
-      <div class="logo logo--footer"><span class="logo__mark">▰</span> LED Studio</div>
-      <nav class="footer-nav" aria-label="Enlaces de pie">
-        <a href="#servicios">Servicios</a>
-        <a href="#sobre-nosotros">Sobre nosotros</a>
-        <a href="#contacto">Contacto</a>
-      </nav>
-      <p class="site-footer__copy">© <span id="year"></span> LED Studio. Todos los derechos reservados.</p>
+  <footer class="bg-brand-dark text-white py-4">
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <span class="fw-bold"><span class="text-brand-accent">▰</span> LED Studio</span>
+        <nav class="d-flex gap-3">
+          <a class="link-light link-opacity-75 text-decoration-none" href="#servicios">Servicios</a>
+          <a class="link-light link-opacity-75 text-decoration-none" href="#sobre-nosotros">Sobre nosotros</a>
+          <a class="link-light link-opacity-75 text-decoration-none" href="#contacto">Contacto</a>
+        </nav>
+        <small class="ms-auto text-white-50">© <span id="year"></span> LED Studio. Todos los derechos reservados.</small>
+      </div>
     </div>
   </footer>
 
+  <!-- Bootstrap JS (carrusel, navbar collapse) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
