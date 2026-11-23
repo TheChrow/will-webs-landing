@@ -10,7 +10,7 @@ FROM deps AS dev
 COPY . .
 # Vite escribe su caché en node_modules/.vite: el usuario node debe poder escribir.
 RUN chown -R node:node /app
-USER node
+USER 1000:1000
 EXPOSE 8080
 CMD ["npm", "run", "dev"]
 
@@ -25,10 +25,15 @@ RUN npm run typecheck && npm test && npm run build \
  && node scripts/csp.mjs build/client build/csp.conf
 
 # ---------- prod (Nginx sin privilegios, solo estáticos) ----------
-FROM nginxinc/nginx-unprivileged:1.27-alpine AS prod
+FROM nginxinc/nginx-unprivileged:1.30-alpine AS prod
+# Parches de seguridad del SO al construir (la imagen base suele ir atrasada).
+USER 0
+# hadolint ignore=DL3017
+RUN apk upgrade --no-cache
+USER 101:101
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/build/csp.conf /etc/nginx/csp.conf
 COPY --from=build /app/build/client/ /usr/share/nginx/html/
 EXPOSE 8080
 HEALTHCHECK --interval=15s --timeout=3s --retries=3 \
-  CMD wget -q -O /dev/null http://127.0.0.1:8080/ || exit 1
+  CMD ["wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/"]

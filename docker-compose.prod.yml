@@ -3,7 +3,7 @@
 #
 # Antes del primer despliegue crear los archivos en ./secrets/ (ignorados por git):
 #   secrets/mysql_root_password  secrets/migrator_db_password  secrets/app_db_password
-#   secrets/hash_pepper  secrets/turnstile_secret_key  secrets/smtp_password
+#   secrets/hash_pepper  secrets/turnstile_secret_key  secrets/smtp_password  secrets/jwt_secret
 services:
   proxy:
     ports:
@@ -34,6 +34,7 @@ services:
       - hash_pepper
       - turnstile_secret_key
       - smtp_password
+      - jwt_secret
     mem_limit: 512m
     cpus: 1.0
 
@@ -46,6 +47,7 @@ services:
       - migrator_db_password
       - hash_pepper
       - turnstile_secret_key
+      - jwt_secret
 
   db:
     environment:
@@ -76,3 +78,5 @@ secrets:
     file: ./secrets/turnstile_secret_key
   smtp_password:
     file: ./secrets/smtp_password
+  jwt_secret:
+    file: ./secrets/jwt_secret

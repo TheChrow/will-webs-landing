@@ -59,7 +59,15 @@ class Settings(BaseSettings):
     mail_from: str = "Will-Webs <no-reply@localhost>"
     leads_notify_to: str = "leads@localhost"
 
+    # Panel admin: JWT de acceso corto + refresh token rotativo en cookie HttpOnly.
+    jwt_secret: SecretStr = SecretStr("dev-only-jwt-secret-change-me-32bytes!")
+    access_token_minutes: int = 15
+    refresh_token_days: int = 7
+    login_max_attempts: int = 5
+    login_lock_minutes: int = 15
+
     lead_retention_months: int = 24
+    audit_retention_months: int = 12
     contact_min_fill_seconds: int = 3
     contact_rate_limit_per_hour: int = 5
 
@@ -80,8 +88,9 @@ class Settings(BaseSettings):
                 for name, value in (
                     ("hash_pepper", self.hash_pepper),
                     ("turnstile_secret_key", self.turnstile_secret_key),
+                    ("jwt_secret", self.jwt_secret),
                 )
-                if not value.get_secret_value() or value.get_secret_value() == "dev-only-pepper"
+                if not value.get_secret_value() or value.get_secret_value().startswith("dev-only")
             ]
             if missing:
                 raise ValueError(f"En producción faltan secretos: {', '.join(missing)}")

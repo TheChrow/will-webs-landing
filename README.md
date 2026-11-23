@@ -3,9 +3,41 @@
 Monorepo del sitio de Will-Webs: frontend, API FastAPI, MySQL y proxy, todo en Docker.
 Especificación completa en [`specs/001-will-webs-site/`](specs/001-will-webs-site/spec.md).
 
-**Estado: Fase 2 (frontend React)** — sitio en React Router v8 pre-renderizado a HTML estático,
-consumiendo la API: servicios, contenido, formulario de contacto protegido y páginas legales.
-Datos en [Master Data](docs/master-data.md); decisiones de UX en la [auditoría UX/UI](docs/ux-audit.md).
+> **¿Vas a continuar el proyecto o desplegarlo?** Empieza por [docs/HANDOFF.md](docs/HANDOFF.md):
+> estado, cómo levantarlo, cómo desplegar a producción y lo que falta.
+
+**Estado: Fase 3 (endurecimiento)** — sitio React pre-renderizado consumiendo la API, panel de
+administración, políticas legales versionadas y checklist de seguridad.
+Datos en [Master Data](docs/master-data.md) · UX en la [auditoría UX/UI](docs/ux-audit.md) ·
+seguridad en [docs/security.md](docs/security.md).
+
+## Panel de administración (`/admin`)
+
+Leads (bandeja y estados), servicios (publicar/editar), contenido del sitio (hero, CTA, misión,
+visión), documentos legales (versiones, borradores, publicación) y auditoría. Roles: `admin` (todo) y
+`editor` (contenido y leads). La API admin también cubre banners, empresas y ajustes
+(`/api/v1/admin/...`, documentada en Swagger en dev).
+
+Crear un usuario (la contraseña, de 12+ caracteres, se pide por consola):
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend python -m app.cli create-admin --email tu@empresa.cl --name "Tu Nombre" --role admin
+```
+
+**Documentos legales:** los borradores completos (`backend/app/legal/*.md`) se cargan como versión
+`0.2.0` sin publicar. Un admin completa los datos entre corchetes (razón social, RUT, emails…) y
+publica desde el panel; el panel no permite publicar mientras queden corchetes. Una versión publicada
+es inmutable (prueba de lo que aceptó cada titular).
+
+**Derechos del titular** (solo admin): `POST /api/v1/admin/data-subject/export` y
+`/anonymize` con `{"email": "..."}`.
+
+**Retención** (ejecutar a diario con el Programador de tareas o cron): anonimiza leads vencidos y
+limpia tokens y auditoría antiguos.
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.prod.yml run --rm backend python -m app.jobs.retention
+```
 
 ## Frontend
 
@@ -96,8 +128,8 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml down
 
 1. Crear los secretos (archivos de una línea, ignorados por git): `secrets/mysql_root_password`,
    `secrets/migrator_db_password`, `secrets/app_db_password`, `secrets/hash_pepper`,
-   `secrets/turnstile_secret_key`, `secrets/smtp_password`. La API no arranca en producción sin
-   `hash_pepper` ni `turnstile_secret_key`.
+   `secrets/turnstile_secret_key`, `secrets/smtp_password`, `secrets/jwt_secret` (32+ bytes
+   aleatorios). La API no arranca en producción sin `hash_pepper`, `turnstile_secret_key` ni `jwt_secret`.
 2. En `.env`: `APP_ENV=production`, `SITE_ADDRESS=<tu-dominio>` (Caddy obtiene TLS automáticamente),
    `ALLOWED_HOSTS=<tu-dominio>,localhost,127.0.0.1`, `VITE_SITE_URL=https://<tu-dominio>` y
    `VITE_TURNSTILE_SITE_KEY=<clave de sitio pública>` (se incrustan en el build del frontend).
@@ -131,6 +163,8 @@ frontend/           React Router v8 + Vite (dev) · Nginx sin privilegios (prod)
   app/styles/       Bootstrap SCSS + marca
   scripts/csp.mjs   genera la CSP con hashes en el build
 docs/ux-audit.md    hallazgos UX/UI y cómo se resolvieron
+docs/security.md    modelo de amenazas, checklist ASVS, escaneos y riesgos aceptados
+.github/workflows/  CI: lint, tests, pip-audit, npm audit, gitleaks, hadolint, Trivy
 db/init/            crea el usuario de aplicación con privilegios solo DML
 proxy/Caddyfile     TLS, cabeceras de seguridad, límite de body, ruteo / y /api
 specs/              especificaciones

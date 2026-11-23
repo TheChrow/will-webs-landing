@@ -7,6 +7,7 @@ contenido ya editado. Uso: ``python -m app.seeds`` (lo ejecuta el job ``migrate`
 import asyncio
 import logging
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 from sqlalchemy import select
@@ -136,6 +137,10 @@ LEGAL = [
     (LegalDocumentType.accessibility, "accesibilidad", "Declaración de Accesibilidad"),
 ]
 DRAFT_BODY = "> **Borrador provisional** — texto pendiente de revisión legal.\n"
+# Borradores completos (app/legal/*.md) como versión 0.2.0 SIN publicar: un admin los
+# revisa, completa los datos entre corchetes y publica desde el panel.
+LEGAL_DRAFTS_DIR = Path(__file__).parent / "legal"
+LEGAL_DRAFT_VERSION = "0.2.0"
 
 ROLES = [("admin", "Acceso total"), ("editor", "Gestiona contenido y leads")]
 
@@ -232,6 +237,16 @@ async def seed(session: AsyncSession) -> dict[str, int]:
             },
         )
         count("legal_document_version", new)
+
+        draft_file = LEGAL_DRAFTS_DIR / f"{doc_type.value}.md"
+        if draft_file.is_file():
+            _, new = await _get_or_add(
+                session,
+                LegalDocumentVersion,
+                {"document_id": doc.id, "version": LEGAL_DRAFT_VERSION},
+                {"body": draft_file.read_text(encoding="utf-8"), "is_current": False},
+            )
+            count("legal_document_version", new)
 
     for name, description in ROLES:
         _, new = await _get_or_add(session, Role, {"name": name}, {"description": description})

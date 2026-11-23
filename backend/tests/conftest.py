@@ -29,6 +29,10 @@ get_settings.cache_clear()
 from app.core.ratelimit import limiter  # noqa: E402
 from app.db.session import dispose_engine  # noqa: E402
 
+ADMIN_EMAIL = "admin@example.com"
+EDITOR_EMAIL = "editor@example.com"
+PASSWORD = "contraseña-muy-segura-123"
+
 
 @pytest.fixture(scope="session")
 def db() -> Iterator[None]:
@@ -44,6 +48,11 @@ def db() -> Iterator[None]:
     command.downgrade(cfg, "base")
     command.upgrade(cfg, "head")
     asyncio.run(seeds.main())
+
+    from app.cli import create_admin
+
+    asyncio.run(create_admin(ADMIN_EMAIL, "Admin Test", "admin", PASSWORD))
+    asyncio.run(create_admin(EDITOR_EMAIL, "Editor Test", "editor", PASSWORD))
     yield
 
 
@@ -62,3 +71,11 @@ async def client(db: None) -> AsyncIterator[httpx.AsyncClient]:
     transport = httpx.ASGITransport(app=create_app(get_settings()), client=("203.0.113.7", 1234))
     async with httpx.AsyncClient(transport=transport, base_url="http://localhost") as c:
         yield c
+
+
+async def login(client: httpx.AsyncClient, email: str = ADMIN_EMAIL) -> dict[str, str]:
+    resp = await client.post(
+        "/api/v1/admin/auth/login", json={"email": email, "password": PASSWORD}
+    )
+    assert resp.status_code == 200, resp.text
+    return {"Authorization": f"Bearer {resp.json()['access_token']}"}

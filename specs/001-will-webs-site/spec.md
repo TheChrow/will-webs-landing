@@ -1,6 +1,6 @@
 # Spec 001 — Will-Webs Site
 
-> Estado: **En curso — Fases 0, 1 y 2 completadas** · Fecha: 2026-11-23 · Base: landing estática `will-webs-landing` (Bootstrap 5, one-page)
+> Estado: **En curso — Fases 0, 1, 2 y 3 completadas** · Fecha: 2026-11-23 · Base: landing estática `will-webs-landing` (Bootstrap 5, one-page)
 
 ## 1. Objetivo
 

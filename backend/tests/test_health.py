@@ -54,6 +54,7 @@ async def test_docs_disabled_in_production() -> None:
         allowed_hosts=["localhost"],
         hash_pepper="prod-pepper",
         turnstile_secret_key="prod-turnstile",
+        jwt_secret="prod-jwt-secret-con-al-menos-32-bytes!!",
     )
     async with _client(settings) as client:
         assert (await client.get("/api/docs")).status_code == 404

@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from app.api.v1.admin.router import router as admin_router
 from app.api.v1.health import router as health_router
 from app.api.v1.public.contact import router as contact_router
 from app.api.v1.public.content import router as content_router
@@ -76,6 +77,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         request.state.request_id = rid
         response = await call_next(request)
         response.headers["X-Request-ID"] = rid
+        if request.url.path.startswith("/api/v1/admin"):
+            # Datos privados: nunca en cachés de navegador ni intermedias.
+            response.headers["Cache-Control"] = "no-store"
         return response
 
     @app.exception_handler(StarletteHTTPException)
@@ -97,6 +101,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(health_router, prefix="/api/v1")
     app.include_router(content_router, prefix="/api/v1")
     app.include_router(contact_router, prefix="/api/v1")
+    app.include_router(admin_router, prefix="/api/v1")
     return app
 
 
