@@ -5,8 +5,17 @@ services:
       - "127.0.0.1:${HTTP_PORT:-8088}:80"
 
   frontend:
+    build:
+      target: dev
+    read_only: false
+    environment:
+      VITE_USE_POLLING: "1"
+      VITE_HMR_CLIENT_PORT: ${HTTP_PORT:-8088}
+      VITE_TURNSTILE_SITE_KEY: ${VITE_TURNSTILE_SITE_KEY:-}
     volumes:
-      - ./frontend/legacy:/usr/share/nginx/html:ro
+      - ./frontend:/app
+      # node_modules del contenedor (Linux), no los del host.
+      - frontend_node_modules:/app/node_modules
 
   backend:
     build:
@@ -19,7 +28,7 @@ services:
     volumes:
       - ./backend:/app
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:${API_PORT_LOCAL:-8001}:8000"
 
   migrate:
     build:
@@ -46,3 +55,6 @@ services:
     ports:
       - "127.0.0.1:8025:8025"
     networks: [internal]
+
+volumes:
+  frontend_node_modules:

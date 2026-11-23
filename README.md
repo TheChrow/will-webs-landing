@@ -3,10 +3,30 @@
 Monorepo del sitio de Will-Webs: frontend, API FastAPI, MySQL y proxy, todo en Docker.
 Especificación completa en [`specs/001-will-webs-site/`](specs/001-will-webs-site/spec.md).
 
-**Estado: Fase 1 (datos y API)** — modelo de datos completo ([Master Data](docs/master-data.md)),
-migración inicial, seeds con el contenido de la landing, API pública de contenido y formulario de
-contacto protegido. El frontend aún sirve la landing estática (`frontend/legacy/`) hasta la
-migración a React (Fase 2).
+**Estado: Fase 2 (frontend React)** — sitio en React Router v8 pre-renderizado a HTML estático,
+consumiendo la API: servicios, contenido, formulario de contacto protegido y páginas legales.
+Datos en [Master Data](docs/master-data.md); decisiones de UX en la [auditoría UX/UI](docs/ux-audit.md).
+
+## Frontend
+
+React 19 + TypeScript + React Router v8 (modo framework, `ssr: false` + `prerender`) + Vite,
+Bootstrap 5.3 SCSS self-hosted, TanStack Query, React Hook Form + Zod, íconos Lucide.
+
+- **Pre-render**: cada ruta (`/`, `/privacidad`, `/cookies`, `/terminos`, `/accesibilidad`) se genera
+  como HTML en el build con el contenido de respaldo (`app/lib/fallback.ts`, igual a los seeds); al
+  cargar, el navegador consulta la API y muestra los datos vigentes.
+- **Producción**: Nginx sin privilegios sirve solo estáticos (sin Node). Rutas desconocidas → 404 real.
+- **CSP sin `'unsafe-inline'`**: `scripts/csp.mjs` calcula en el build los hashes SHA-256 de los
+  scripts inline de React Router y Nginx los emite en la cabecera. No usar `style="..."` en JSX.
+- **Desarrollo**: Vite con HMR detrás del proxy (http://localhost:8088).
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.dev.yml exec frontend npm test
+```
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.dev.yml exec frontend npm run typecheck
+```
 
 ## API v1
 
@@ -43,11 +63,11 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
 | http://localhost:8088 | Sitio (vía proxy Caddy) |
 | http://localhost:8088/api/v1/health | Liveness de la API |
 | http://localhost:8088/api/v1/health/ready | Readiness (incluye ping a MySQL) |
-| http://localhost:8000/api/docs | Swagger (solo dev) |
+| http://localhost:8001/api/docs | Swagger (solo dev) |
 | http://localhost:8025 | Mailpit (correo de prueba) |
 | `localhost:3307` | MySQL (solo desde 127.0.0.1) |
 
-Los puertos locales se cambian en `.env` (`HTTP_PORT`, `DB_PORT_LOCAL`).
+Los puertos locales se cambian en `.env` (`HTTP_PORT`, `API_PORT_LOCAL`, `DB_PORT_LOCAL`).
 
 ### Comandos útiles
 
@@ -78,8 +98,9 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml down
    `secrets/migrator_db_password`, `secrets/app_db_password`, `secrets/hash_pepper`,
    `secrets/turnstile_secret_key`, `secrets/smtp_password`. La API no arranca en producción sin
    `hash_pepper` ni `turnstile_secret_key`.
-2. En `.env`: `APP_ENV=production`, `SITE_ADDRESS=<tu-dominio>` (Caddy obtiene TLS automáticamente)
-   y `ALLOWED_HOSTS=<tu-dominio>,localhost,127.0.0.1`.
+2. En `.env`: `APP_ENV=production`, `SITE_ADDRESS=<tu-dominio>` (Caddy obtiene TLS automáticamente),
+   `ALLOWED_HOSTS=<tu-dominio>,localhost,127.0.0.1`, `VITE_SITE_URL=https://<tu-dominio>` y
+   `VITE_TURNSTILE_SITE_KEY=<clave de sitio pública>` (se incrustan en el build del frontend).
 3. Levantar:
 
 ```powershell
@@ -103,7 +124,13 @@ backend/            FastAPI + SQLAlchemy 2 (async) + Alembic · dependencias con
   app/seeds.py      master data inicial, idempotente (lo corre el job migrate)
   migrations/       Alembic (usa el usuario migrator)
 docs/master-data.md diccionario de datos, ER, reglas, retención
-frontend/           Nginx sin privilegios sirviendo frontend/legacy (landing Bootstrap 5)
+frontend/           React Router v8 + Vite (dev) · Nginx sin privilegios (prod)
+  app/routes/       páginas: home y legales (+ 404)
+  app/components/   secciones del sitio y formulario de contacto
+  app/lib/          cliente API, queries, esquema Zod, contenido de respaldo, SEO
+  app/styles/       Bootstrap SCSS + marca
+  scripts/csp.mjs   genera la CSP con hashes en el build
+docs/ux-audit.md    hallazgos UX/UI y cómo se resolvieron
 db/init/            crea el usuario de aplicación con privilegios solo DML
 proxy/Caddyfile     TLS, cabeceras de seguridad, límite de body, ruteo / y /api
 specs/              especificaciones
@@ -124,4 +151,5 @@ specs/              especificaciones
 | Azul medio | `#094183` | Títulos y acentos |
 | Azul vivo | `#014DBF` | Primario / CTA |
 
-Definidos en `frontend/legacy/styles.css` (`:root`).
+Definidos en `frontend/app/styles/main.scss`. La landing estática original quedó en el historial de git
+(commit `4d58ea4`, `frontend/legacy/`).

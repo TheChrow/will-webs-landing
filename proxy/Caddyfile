@@ -14,9 +14,8 @@
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
 		Cross-Origin-Opener-Policy "same-origin"
 		X-Frame-Options "DENY"
-		# Fase 0: la landing legacy carga Bootstrap desde cdn.jsdelivr.net.
-		# Al migrar a React (Bootstrap self-hosted) quitar el CDN de la CSP.
-		Content-Security-Policy "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+		# La CSP del sitio la emite el frontend (Nginx) con los hashes de los scripts
+		# inline generados en el build; la de la API se define abajo.
 		{$HSTS_HEADER}
 	}
 
@@ -25,6 +24,8 @@
 	}
 
 	handle /api/* {
+		# La API solo devuelve JSON: nada que cargar ni embeber. (Swagger en dev: directo en API_PORT_LOCAL.)
+		header ?Content-Security-Policy "default-src 'none'; frame-ancestors 'none'"
 		reverse_proxy backend:8000 {
 			header_up X-Request-ID {http.request.uuid}
 		}

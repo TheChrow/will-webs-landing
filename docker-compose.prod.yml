@@ -16,6 +16,11 @@ services:
     cpus: 0.5
 
   frontend:
+    build:
+      target: prod
+      args:
+        VITE_TURNSTILE_SITE_KEY: ${VITE_TURNSTILE_SITE_KEY:?define VITE_TURNSTILE_SITE_KEY (clave de sitio pública)}
+        VITE_SITE_URL: ${VITE_SITE_URL:?define VITE_SITE_URL (ej. https://willwebs.cl)}
     mem_limit: 128m
     cpus: 0.5
 
