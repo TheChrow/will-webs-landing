@@ -14,8 +14,8 @@ services:
     read_only: false
     environment:
       APP_DB_PASSWORD: ${APP_DB_PASSWORD:?define APP_DB_PASSWORD en .env}
-      SMTP_HOST: mailpit
-      SMTP_PORT: "1025"
+      # Vacío = captcha desactivado (solo dev). Para probar Turnstile usa sus claves de test.
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
     volumes:
       - ./backend:/app
     ports:
@@ -34,6 +34,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?define MYSQL_ROOT_PASSWORD en .env}
       MYSQL_PASSWORD: ${MIGRATOR_DB_PASSWORD}
       APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+      CREATE_TEST_DB: "1"
     ports:
       - "127.0.0.1:${DB_PORT_LOCAL:-3307}:3306"
 

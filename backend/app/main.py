@@ -12,6 +12,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app.api.v1.health import router as health_router
+from app.api.v1.public.contact import router as contact_router
+from app.api.v1.public.content import router as content_router
 from app.core.config import Settings, get_settings
 from app.db.session import dispose_engine
 
@@ -20,13 +22,21 @@ logger = logging.getLogger("app")
 _REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9-]{1,64}$")
 
 
-def _problem(status: int, title: str, detail: str | None = None, **extra: object) -> JSONResponse:
+def _problem(
+    status: int,
+    title: str,
+    detail: str | None = None,
+    headers: dict[str, str] | None = None,
+    **extra: object,
+) -> JSONResponse:
     """Respuesta de error RFC 9457 (Problem Details)."""
     body: dict[str, object] = {"type": "about:blank", "title": title, "status": status}
     if detail:
         body["detail"] = detail
     body.update(extra)
-    return JSONResponse(body, status_code=status, media_type="application/problem+json")
+    return JSONResponse(
+        body, status_code=status, media_type="application/problem+json", headers=headers
+    )
 
 
 @asynccontextmanager
@@ -70,10 +80,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.exception_handler(StarletteHTTPException)
     async def http_error(_: Request, exc: StarletteHTTPException) -> JSONResponse:
-        return _problem(exc.status_code, str(exc.detail))
+        return _problem(exc.status_code, str(exc.detail), headers=getattr(exc, "headers", None))
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
+        # Sin "input": no se devuelve el valor enviado (puede contener datos personales).
         errors = [{"loc": e["loc"], "msg": e["msg"], "type": e["type"]} for e in exc.errors()]
         return _problem(422, "Validation error", errors=errors)
 
@@ -84,6 +95,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return _problem(500, "Internal Server Error")
 
     app.include_router(health_router, prefix="/api/v1")
+    app.include_router(content_router, prefix="/api/v1")
+    app.include_router(contact_router, prefix="/api/v1")
     return app
 
 

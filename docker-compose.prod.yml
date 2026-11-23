@@ -3,6 +3,7 @@
 #
 # Antes del primer despliegue crear los archivos en ./secrets/ (ignorados por git):
 #   secrets/mysql_root_password  secrets/migrator_db_password  secrets/app_db_password
+#   secrets/hash_pepper  secrets/turnstile_secret_key  secrets/smtp_password
 services:
   proxy:
     ports:
@@ -25,6 +26,9 @@ services:
       APP_ENV: production
     secrets:
       - app_db_password
+      - hash_pepper
+      - turnstile_secret_key
+      - smtp_password
     mem_limit: 512m
     cpus: 1.0
 
@@ -35,6 +39,8 @@ services:
       APP_ENV: production
     secrets:
       - migrator_db_password
+      - hash_pepper
+      - turnstile_secret_key
 
   db:
     environment:
@@ -59,3 +65,9 @@ secrets:
     file: ./secrets/migrator_db_password
   app_db_password:
     file: ./secrets/app_db_password
+  hash_pepper:
+    file: ./secrets/hash_pepper
+  turnstile_secret_key:
+    file: ./secrets/turnstile_secret_key
+  smtp_password:
+    file: ./secrets/smtp_password

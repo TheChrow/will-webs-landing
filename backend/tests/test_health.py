@@ -43,8 +43,18 @@ async def test_untrusted_host_rejected(dev_settings: Settings) -> None:
     assert resp.status_code == 400
 
 
+def test_production_requires_secrets() -> None:
+    with pytest.raises(ValueError, match="hash_pepper"):
+        Settings(app_env="production")
+
+
 async def test_docs_disabled_in_production() -> None:
-    settings = Settings(app_env="production", allowed_hosts=["localhost"])
+    settings = Settings(
+        app_env="production",
+        allowed_hosts=["localhost"],
+        hash_pepper="prod-pepper",
+        turnstile_secret_key="prod-turnstile",
+    )
     async with _client(settings) as client:
         assert (await client.get("/api/docs")).status_code == 404
         assert (await client.get("/api/openapi.json")).status_code == 404

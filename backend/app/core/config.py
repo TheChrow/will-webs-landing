@@ -43,6 +43,26 @@ class Settings(BaseSettings):
     migrator_db_user: str = "willwebs_migrator"
     migrator_db_password: SecretStr = SecretStr("")
 
+    # Pepper para seudonimizar IPs/emails (HMAC). Obligatorio en producción.
+    hash_pepper: SecretStr = SecretStr("dev-only-pepper")
+
+    # Cloudflare Turnstile. Vacío = verificación desactivada (solo fuera de producción).
+    turnstile_secret_key: SecretStr = SecretStr("")
+    turnstile_verify_url: str = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+
+    # Correo de notificación de leads.
+    smtp_host: str = "mailpit"
+    smtp_port: int = 1025
+    smtp_user: str = ""
+    smtp_password: SecretStr = SecretStr("")
+    smtp_starttls: bool = False
+    mail_from: str = "Will-Webs <no-reply@localhost>"
+    leads_notify_to: str = "leads@localhost"
+
+    lead_retention_months: int = 24
+    contact_min_fill_seconds: int = 3
+    contact_rate_limit_per_hour: int = 5
+
     allowed_hosts: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["localhost", "127.0.0.1"]
     )
@@ -52,6 +72,19 @@ class Settings(BaseSettings):
     @classmethod
     def _parse_csv(cls, value: str | list[str]) -> list[str]:
         return _split_csv(value)
+
+    def model_post_init(self, __context: object) -> None:
+        if self.is_production:
+            missing = [
+                name
+                for name, value in (
+                    ("hash_pepper", self.hash_pepper),
+                    ("turnstile_secret_key", self.turnstile_secret_key),
+                )
+                if not value.get_secret_value() or value.get_secret_value() == "dev-only-pepper"
+            ]
+            if missing:
+                raise ValueError(f"En producción faltan secretos: {', '.join(missing)}")
 
     @property
     def is_production(self) -> bool:

@@ -18,6 +18,12 @@ x-backend-env: &backend-env
   MIGRATOR_DB_USER: ${MIGRATOR_DB_USER:?define MIGRATOR_DB_USER en .env}
   ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend}
   CORS_ORIGINS: ${CORS_ORIGINS:-}
+  SMTP_HOST: ${SMTP_HOST:-mailpit}
+  SMTP_PORT: ${SMTP_PORT:-1025}
+  SMTP_USER: ${SMTP_USER:-}
+  SMTP_STARTTLS: ${SMTP_STARTTLS:-false}
+  MAIL_FROM: ${MAIL_FROM:-Will-Webs <no-reply@localhost>}
+  LEADS_NOTIFY_TO: ${LEADS_NOTIFY_TO:-leads@localhost}
 
 services:
   proxy:
@@ -79,7 +85,7 @@ services:
     read_only: true
     tmpfs:
       - /tmp
-    command: ["alembic", "upgrade", "head"]
+    command: ["sh", "-c", "alembic upgrade head && python -m app.seeds"]
     environment:
       <<: *backend-env
     depends_on:

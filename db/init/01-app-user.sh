@@ -22,3 +22,13 @@ FLUSH PRIVILEGES;
 SQL
 
 echo "[init] usuario de aplicación '${APP_DB_USER}' creado con privilegios DML sobre '${MYSQL_DATABASE}'"
+
+# Base de datos para tests de integración (solo desarrollo/CI).
+if [ "${CREATE_TEST_DB:-0}" = "1" ]; then
+  mysql --protocol=socket -uroot -p"${MYSQL_ROOT_PASSWORD}" <<SQL
+CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}_test\` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}_test\`.* TO '${MYSQL_USER}'@'%';
+FLUSH PRIVILEGES;
+SQL
+  echo "[init] base de datos de tests '${MYSQL_DATABASE}_test' creada"
+fi

@@ -5,11 +5,10 @@ from alembic import context
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import create_async_engine
 
+# Registrar todos los modelos en Base.metadata para autogenerate.
+from app import models  # noqa: F401,E402
 from app.core.config import get_settings
 from app.db.base import Base
-
-# Importar aquí los módulos de modelos para que autogenerate los detecte, p. ej.:
-# from app import models  # noqa: F401
 
 config = context.config
 if config.config_file_name is not None:
