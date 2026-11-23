@@ -1,0 +1,126 @@
+# Base común a dev y prod. Usar siempre junto con un overlay:
+#   dev : docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#   prod: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+name: willwebs
+
+x-hardening: &hardening
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+x-backend-env: &backend-env
+  APP_ENV: ${APP_ENV:-development}
+  DB_HOST: db
+  DB_PORT: "3306"
+  DB_NAME: ${MYSQL_DATABASE:?define MYSQL_DATABASE en .env}
+  APP_DB_USER: ${APP_DB_USER:?define APP_DB_USER en .env}
+  MIGRATOR_DB_USER: ${MIGRATOR_DB_USER:?define MIGRATOR_DB_USER en .env}
+  ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend}
+  CORS_ORIGINS: ${CORS_ORIGINS:-}
+
+services:
+  proxy:
+    image: caddy:2.10-alpine
+    <<: *hardening
+    cap_add:
+      - NET_BIND_SERVICE
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+      HSTS_HEADER: ${HSTS_HEADER:-}
+    volumes:
+      - ./proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    networks: [public]
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    <<: *hardening
+    read_only: true
+    tmpfs:
+      - /tmp
+    networks: [public]
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    <<: *hardening
+    read_only: true
+    tmpfs:
+      - /tmp
+    environment:
+      <<: *backend-env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=2).status == 200 else 1)"]
+      interval: 15s
+      timeout: 3s
+      start_period: 15s
+      retries: 3
+    networks: [public, internal]
+    restart: unless-stopped
+
+  # Job one-shot: aplica migraciones con el usuario migrator y termina.
+  migrate:
+    build:
+      context: ./backend
+    <<: *hardening
+    read_only: true
+    tmpfs:
+      - /tmp
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      <<: *backend-env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [internal]
+    restart: "no"
+
+  db:
+    image: mysql:8.4
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+00:00
+      - --local-infile=0
+      - --skip-name-resolve
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MIGRATOR_DB_USER}
+      APP_DB_USER: ${APP_DB_USER}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # mysqladmin ping devuelve 0 si el servidor responde, incluso sin credenciales.
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 10
+    networks: [internal]
+    restart: unless-stopped
+
+networks:
+  public:
+  internal:
+    # En prod el overlay la marca como internal: sin salida a Internet.
+
+volumes:
+  db_data:
+  caddy_data:
+  caddy_config:

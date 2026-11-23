@@ -1,0 +1,61 @@
+# Overlay de producción: imágenes inmutables, secretos como archivos (Docker secrets),
+# solo el proxy expone puertos, red interna sin salida a Internet.
+#
+# Antes del primer despliegue crear los archivos en ./secrets/ (ignorados por git):
+#   secrets/mysql_root_password  secrets/migrator_db_password  secrets/app_db_password
+services:
+  proxy:
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      HSTS_HEADER: 'Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"'
+    mem_limit: 256m
+    cpus: 0.5
+
+  frontend:
+    mem_limit: 128m
+    cpus: 0.5
+
+  backend:
+    build:
+      target: prod
+    environment:
+      APP_ENV: production
+    secrets:
+      - app_db_password
+    mem_limit: 512m
+    cpus: 1.0
+
+  migrate:
+    build:
+      target: prod
+    environment:
+      APP_ENV: production
+    secrets:
+      - migrator_db_password
+
+  db:
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+      MYSQL_PASSWORD_FILE: /run/secrets/migrator_db_password
+      APP_DB_PASSWORD_FILE: /run/secrets/app_db_password
+    secrets:
+      - mysql_root_password
+      - migrator_db_password
+      - app_db_password
+    mem_limit: 1g
+    cpus: 1.0
+
+networks:
+  internal:
+    internal: true
+
+secrets:
+  mysql_root_password:
+    file: ./secrets/mysql_root_password
+  migrator_db_password:
+    file: ./secrets/migrator_db_password
+  app_db_password:
+    file: ./secrets/app_db_password

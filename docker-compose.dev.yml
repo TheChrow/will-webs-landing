@@ -1,0 +1,47 @@
+# Overlay de desarrollo: hot reload, contraseñas desde .env, puertos solo en 127.0.0.1.
+services:
+  proxy:
+    ports:
+      - "127.0.0.1:${HTTP_PORT:-8088}:80"
+
+  frontend:
+    volumes:
+      - ./frontend/legacy:/usr/share/nginx/html:ro
+
+  backend:
+    build:
+      target: dev
+    read_only: false
+    environment:
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?define APP_DB_PASSWORD en .env}
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+    volumes:
+      - ./backend:/app
+    ports:
+      - "127.0.0.1:8000:8000"
+
+  migrate:
+    build:
+      target: dev
+    environment:
+      MIGRATOR_DB_PASSWORD: ${MIGRATOR_DB_PASSWORD:?define MIGRATOR_DB_PASSWORD en .env}
+    volumes:
+      - ./backend:/app
+
+  db:
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?define MYSQL_ROOT_PASSWORD en .env}
+      MYSQL_PASSWORD: ${MIGRATOR_DB_PASSWORD}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+    ports:
+      - "127.0.0.1:${DB_PORT_LOCAL:-3307}:3306"
+
+  # SMTP falso para probar correos: UI en http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.27
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "127.0.0.1:8025:8025"
+    networks: [internal]
